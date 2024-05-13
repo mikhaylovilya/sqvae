@@ -5,7 +5,7 @@ from torch.distributions import Categorical
 
 
 def sample_gumbel(shape, eps=1e-10):
-    U = torch.rand(shape, device="cuda")
+    U = torch.rand(shape, device="cpu")
     return -torch.log(-torch.log(U + eps) + eps)
 
 
@@ -71,7 +71,7 @@ class GaussianVectorQuantizer(VectorQuantizer):
         else:
             if flg_quant_det:
                 indices = torch.argmax(logit, dim=1).unsqueeze(1)
-                encodings_hard = torch.zeros(indices.shape[0], self.size_dict, device="cuda")
+                encodings_hard = torch.zeros(indices.shape[0], self.size_dict, device="cpu")
                 encodings_hard.scatter_(1, indices, 1)
                 avg_probs = torch.mean(encodings_hard, dim=0)
             else:
@@ -133,7 +133,7 @@ class VmfVectorQuantizer(VectorQuantizer):
         else:
             if flg_quant_det:
                 indices = torch.argmax(logit, dim=1).unsqueeze(1)
-                encodings_hard = torch.zeros(indices.shape[0], self.size_dict, device="cuda")
+                encodings_hard = torch.zeros(indices.shape[0], self.size_dict, device="cpu")
                 encodings_hard.scatter_(1, indices, 1)
                 avg_probs = torch.mean(encodings_hard, dim=0)
             else:

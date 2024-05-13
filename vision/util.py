@@ -134,8 +134,8 @@ def logits_to_onehot(prob, n_class=19):
     size = prob.size()
     label_idx = torch.argmin(prob, dim=1, keepdim=True)
     oneHot_size = (size[0], n_class, size[2], size[3])
-    label = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-    label = label.scatter_(1, label_idx.data.long().cuda(), 1.0)
+    label = torch.FloatTensor(torch.Size(oneHot_size)).zero_()
+    label = label.scatter_(1, label_idx.data.long(), 1.0)
 
     return label
 
@@ -193,8 +193,8 @@ def plot_images_paper(images, filename, nrows=4, ncols=8, flg_norm=False):
 def idx_to_onehot(idx, n_class=19):
     size = idx.size()
     oneHot_size = (size[0], n_class, size[2], size[3])
-    label = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-    label = label.scatter_(1, idx.data.long().cuda(), 1.0)
+    label = torch.FloatTensor(torch.Size(oneHot_size)).zero_()
+    label = label.scatter_(1, idx.data.long(), 1.0)
 
     return label
 
@@ -203,8 +203,8 @@ def logits_to_onehot(prob, n_class=19):
     size = prob.size()
     label_idx = torch.argmin(prob, dim=1, keepdim=True)
     oneHot_size = (size[0], n_class, size[2], size[3])
-    label = torch.cuda.FloatTensor(torch.Size(oneHot_size)).zero_()
-    label = label.scatter_(1, label_idx.data.long().cuda(), 1.0)
+    label = torch.FloatTensor(torch.Size(oneHot_size)).zero_()
+    label = label.scatter_(1, label_idx.data.long(), 1.0)
 
     return label
 
@@ -310,7 +310,7 @@ def label_to_segment(label, nclass=19):
         [255., 153., 51],
         [0., 204., 0]
     ]
-    color_torch = torch.tensor(color_list).cuda()
+    color_torch = torch.tensor(color_list)
     shape = label.shape
     label_permuted = label.permute(0, 2, 3, 1).contiguous()
     label_reshaped = label_permuted.view(-1, nclass)

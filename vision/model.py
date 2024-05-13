@@ -55,11 +55,11 @@ class SQVAE(nn.Module):
         # Encoding
         if self.param_var_q == "vmf":
             z_from_encoder = F.normalize(self.encoder(x), p=2.0, dim=1)
-            self.param_q = (self.log_param_q_scalar.exp() + torch.tensor([1.0], device="cuda"))
+            self.param_q = (self.log_param_q_scalar.exp() + torch.tensor([1.0], device="cpu"))
         else:
             if self.param_var_q == "gaussian_1":
                 z_from_encoder = self.encoder(x)
-                log_var_q = torch.tensor([0.0], device="cuda")
+                log_var_q = torch.tensor([0.0], device="cpu")
             else:
                 z_from_encoder, log_var = self.encoder(x)
                 if self.param_var_q == "gaussian_2":

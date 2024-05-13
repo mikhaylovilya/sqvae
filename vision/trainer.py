@@ -27,7 +27,7 @@ class GaussianSQVAETrainer(TrainerBase):
                 temperature_current = self._set_temperature(
                     step, self.cfgs.quantization.temperature)
                 self.model.module.quantizer.set_temperature(temperature_current)
-            x = x.cuda()
+            x = x
             _, _, loss = self.model(x, flg_train=True, flg_quant_det=False)
             self.optimizer.zero_grad()
             loss["all"].backward()
@@ -46,6 +46,7 @@ class GaussianSQVAETrainer(TrainerBase):
         return result    
     
     def _test(self, mode="validation"):
+        # print("GaussianSQVAETrainer: Testing mode=", mode)
         self.model.eval()
         _ = self._test_sub(False, mode)
         result = self._test_sub(True, mode)
@@ -63,7 +64,8 @@ class GaussianSQVAETrainer(TrainerBase):
         start_time = time.time()
         with torch.no_grad():
             for x, _ in data_loader:
-                x = x.cuda()
+                x = x
+                # print(x.shape)
                 _, _, loss = self.model(x, flg_quant_det=flg_quant_det)
                 test_loss.append(loss["all"].item())
                 ms_error.append(loss["mse"].item())

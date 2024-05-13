@@ -1,0 +1,5 @@
+.env/
+.idea/
+__pycache__/
+vision/configs/checkpoints
+vision/configs/dataset

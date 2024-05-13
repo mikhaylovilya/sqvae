@@ -6,6 +6,9 @@ import torch
 from trainer import GaussianSQVAETrainer, VmfSQVAETrainer
 from util import set_seeds, get_loader
 
+from PIL import Image
+from torchvision import transforms
+from util import plot_images
 
 def arg_parse():
     parser = argparse.ArgumentParser(
@@ -44,9 +47,28 @@ def load_config(args):
     flgs = cfgs.flags
     return cfgs, flgs
 
+def test_my_image(trainer:VmfSQVAETrainer):
+    IMG_PATH = "/home/cy/Desktop/ml-reps/sqvae/vision/configs/images3.jpg"
+    img = Image.open(IMG_PATH)
+    converter = transforms.ToTensor()
+    x0 = converter(img)
+    # print("x0.shape: {}\nx0: {}".format(x0.shape, x0))
+    x = torch.reshape(x0, (1, x0.shape[0], x0.shape[1], x0.shape[2]))
+    # print("x.shape: {}\nx:{}".format(x.shape, x))
+
+    output = trainer.model(x, flg_train=False, flg_quant_det=True)[0]
+    x_tilde = output
+    print(x_tilde.shape)
+    x_cat = torch.cat([x, x_tilde], 0)
+    images = x_cat.cpu().data.numpy()
+    nrows = 1
+    ncols = 2
+    plot_images(images, "/home/cy/Desktop/ml-reps/sqvae/vision/configs/erhm.png", nrows=nrows, ncols=ncols)
+    return None
 
 if __name__ == "__main__":
     print("main.py")
+    print(torch.__version__)
     
     ## Experimental setup
     args = arg_parse()
@@ -80,5 +102,6 @@ if __name__ == "__main__":
     if flgs.save:
         trainer.load(args.timestamp)
         print("Best models were loaded!!")
-        res_test = trainer.test()
+        # res_test = trainer.test()
+        test_my_image(trainer)
 

@@ -15,7 +15,7 @@ class TrainerBase(nn.Module):
         self.val_loader = val_loader
         self.test_loader = test_loader
         self.model = eval(
-            "nn.DataParallel({}(cfgs, flgs).cuda())".format(cfgs.model.name))
+            "nn.DataParallel({}(cfgs, flgs))".format(cfgs.model.name))
         self.optimizer = torch.optim.Adam(
             self.model.parameters(), lr=cfgs.train.lr, amsgrad=False)
         self.scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
@@ -75,10 +75,12 @@ class TrainerBase(nn.Module):
     def preprocess(self, x, y):
         if self.cfgs.dataset.name == "CelebAMask_HQ":
             y[:, 0, :, :] = y[:, 0, :, :] * 255.0
-            y = torch.round(y[:, 0, :, :]).cuda()
+            y = torch.round(y[:, 0, :, :])
         return y
     
     def test(self, mode="test"):
+        # debug
+        # print("Testing mode:", mode)
         result = self._test(mode)
         if mode == "test":
             self._writer_test(result)
@@ -112,7 +114,7 @@ class TrainerBase(nn.Module):
     def generate_reconstructions_paper(self, nrows=1, ncols=10, off_set=0):
         self.model.eval()
         x = self.test_loader.__iter__().next()[0]
-        x = x[off_set:off_set+nrows*ncols].cuda()
+        x = x[off_set:off_set+nrows*ncols]
         output = self.model(x, flg_train=False, flg_quant_det=True)
         x_tilde = output[0]
         images_original = x.cpu().data.numpy()
@@ -125,7 +127,7 @@ class TrainerBase(nn.Module):
     def _generate_reconstructions_continuous(self, filename, nrows=4, ncols=8):
         self.model.eval()
         x = self.test_loader.__iter__().next()[0]
-        x = x[:nrows*ncols].cuda()
+        x = x[:nrows*ncols]
         output = self.model(x, flg_train=False, flg_quant_det=True)
         x_tilde = output[0]
         x_cat = torch.cat([x, x_tilde], 0)
@@ -135,8 +137,8 @@ class TrainerBase(nn.Module):
     def _generate_reconstructions_discrete(self, filename, nrows=4, ncols=8):
         self.model.eval()
         x, y = self.test_loader.__iter__().next()
-        x = x[:nrows*ncols].cuda()
-        y = y[:nrows*ncols].cuda()
+        x = x[:nrows*ncols]
+        y = y[:nrows*ncols]
         y[:, 0, :, :] = y[:, 0, :, :] * 255.0
         y_long = y
         y = y[:, 0, :, :]
